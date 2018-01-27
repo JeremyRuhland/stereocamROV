@@ -1,0 +1,3 @@
+[submodule "python-v4l2capture"]
+	path = python-v4l2capture
+	url = https://github.com/rmca/python-v4l2capture
