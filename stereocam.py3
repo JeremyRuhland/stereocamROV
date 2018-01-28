@@ -8,9 +8,6 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 import os
 
-global video1
-global video2
-
 def mergeImages(file1, file2):
     """Merge two images into one, displayed side by side
     :param file1: path to first image file
@@ -38,7 +35,7 @@ def mergeImages(file1, file2):
 class mjpg_RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if (self.path == '/stereo.mjpg'):
-        
+
             video1 = v4l2capture.Video_device("/dev/video1")
             video2 = v4l2capture.Video_device("/dev/video0")
 
@@ -57,9 +54,9 @@ class mjpg_RequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type','multipart/x-mixed-replace; boundary=--jpgboundary')
             self.end_headers()
-            
+
             print(self.path)
-            
+
             while True:
                 try:
                     select.select((video1,), (), ())
@@ -72,13 +69,13 @@ class mjpg_RequestHandler(BaseHTTPRequestHandler):
 
                     imgMerge = mergeImages(BytesIO(img1), BytesIO(img2))
                     imgMerge.save(imageIo, format="JPEG")
-                    
+
                     self.wfile.write(b"--jpgboundary\n")
                     self.send_header('Content-type', 'image/jpeg')
                     self.send_header('Content-length', len(imageIo.getvalue()))
                     self.end_headers()
                     self.wfile.write(imageIo.getvalue())
-                    
+
                     time.sleep(0.07)
 
                 except BrokenPipeError:
